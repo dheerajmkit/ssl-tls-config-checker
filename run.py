@@ -15,6 +15,8 @@ import sys
 
 from tls.checker import load_hosts, check_host, live_check
 from tls.checks import check_hosts
+from tls.grading import grade_host
+from tls.headers import check_headers
 from tls.report import summarize, render_text, render_json
 
 
@@ -30,6 +32,10 @@ def main(argv=None):
     parser.add_argument("inventory", nargs="?",
                         help="host inventory JSON file")
     parser.add_argument("--live", help="live host, optionally host:port")
+    parser.add_argument("--headers",
+                        help="check HTTPS security headers for host[:port]")
+    parser.add_argument("--grade", action="store_true",
+                        help="print an A-F grade per host")
     parser.add_argument("--json", action="store_true",
                         help="emit findings as JSON")
     args = parser.parse_args(argv)
@@ -56,10 +62,23 @@ def main(argv=None):
 
     findings = check_hosts(hosts)
 
+    if args.headers:
+        try:
+            host, port = _parse_live(args.headers)
+            findings.extend(check_headers(host, port))
+            source += f" + headers:{args.headers}"
+        except (OSError, ValueError) as exc:
+            print(f"error: header check failed: {exc}", file=sys.stderr)
+            return 2
+
     if args.json:
         print(render_json(source, findings))
     else:
         print(render_text(source, findings))
+        if args.grade:
+            for host in hosts:
+                name, letter = grade_host(host, findings)
+                print(f"grade: {name}: {letter}")
 
     counts = summarize(findings)
     return 1 if (counts["CRITICAL"] or counts["HIGH"]) else 0

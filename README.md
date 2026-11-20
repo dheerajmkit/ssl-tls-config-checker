@@ -15,13 +15,22 @@ No dependencies to install — the standard library is all you need:
 
 ```bash
 python3 run.py samples/hosts.json
+python3 run.py samples/hosts.json --grade
 python3 run.py --live example.com
+python3 run.py --live example.com --headers example.com
 ```
 
 Exit codes: `2` = usage error or unreadable inventory, `1` = at
 least one high or critical finding, `0` = no high or critical
 findings. Live checks need network access and fail closed with a
 clear error when the host is unreachable.
+
+## Day-2 scope
+
+- A–F grading (`--grade`): each host is graded from its findings
+  (CRITICAL −40, HIGH −20, MEDIUM −10, LOW −5).
+- HTTPS security-header checks (`--headers host`): HSTS presence and
+  max-age, X-Content-Type-Options, and clickjacking headers.
 
 ## Day-1 scope
 
