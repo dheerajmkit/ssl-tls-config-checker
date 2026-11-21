@@ -25,6 +25,13 @@ least one high or critical finding, `0` = no high or critical
 findings. Live checks need network access and fail closed with a
 clear error when the host is unreachable.
 
+## Day-3 scope
+
+- Unit tests (`tests/test_checks.py`): run with
+  `python3 -m unittest discover -s tests -v`.
+- Full usage guide (`docs/USAGE.md`) and a demo script
+  (`examples/run-all.sh`).
+
 ## Day-2 scope
 
 - A–F grading (`--grade`): each host is graded from its findings
